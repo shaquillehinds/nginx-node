@@ -14,3 +14,12 @@ RUN apt -y install nginx
 
 RUN apt-get -y install python3-certbot-nginx
 
+RUN touch /var/log/node && mkdir /srv/node
+
+WORKDIR /srv/node
+
+COPY entrypoint.sh .
+
+RUN ["chmod", "+x", "/srv/node/entrypoint.sh"]
+
+ENTRYPOINT [ "./entrypoint.sh" ]
