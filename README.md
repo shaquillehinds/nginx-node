@@ -6,15 +6,20 @@ Make sure you have a subdomain name(s) ready and that you have created an A reco
 
 ## Instructions
 
-1. Create nginx/default and nginx/.conf files in the root of your project. E.g
+1. Create nginx/default and nginx/.conf files in the root of your project. Project structure should look like this and have these files:
 
 ```
- mkdir nginx && touch nginx/default nginx/.conf
+your_project
+  \_nginx/
+    \_ default
+    \_ .conf
+  \_ public/
+  \_ ...
 ```
 
 2. Add your nginx server settings to the nginx/default file. See example in this repo if you need reference.
 
-3. Add your email to the nginx/.conf file so letsencrypt can update you on the status of your certificate. E.g
+3. Add your email to the nginx/.conf file so letsencrypt can update you on the status of your certificate. It should be in this format
 
 ```
 email=your@email.com
