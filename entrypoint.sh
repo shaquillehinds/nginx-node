@@ -12,12 +12,12 @@ then
   echo $separator
   echo "Nginx default config found"
   service nginx restart
-  domain=$(grep '^\s*server_name\b' ./nginx/default | cut -d ';' -f 1 | rev | cut -d ' ' -f 1 | rev)
+  domains=$(bash get_domains.sh)
   publicPath=$(grep '^\s*root\b' ./nginx/default | cut -d ';' -f 1 | rev | cut -d ' ' -f 1 | rev)
-  if [ ! -z $domain ]
+  if [ ! -z "$domains" ]
   then
     echo $separator
-    echo "Found domain in nginx default file: $domain"
+    echo "Found domain(s) in nginx default file: $domains"
     if [ ! -z $publicPath ]
     then
       echo $separator
@@ -32,16 +32,16 @@ then
       then
         echo $separator
         echo "Using email: $email"
-        certbot --nginx -d $domain --agree-tos --email $email --non-interactive
+        certbot --nginx $domains --agree-tos --email $email --non-interactive
       else
          echo $separator
          echo "No email found in .conf file. Using john@doe.com"
-         certbot --nginx -d $domain --agree-tos --email john@doe.com --non-interactive
+         certbot --nginx $domains --agree-tos --email john@doe.com --non-interactive
       fi
     else
       echo $separator
       echo "No .conf file found in nginx folder. Running in non interactive mode with email: john@doe.com"
-      certbot --nginx -d $domain --agree-tos --email john@doe.com --non-interactive
+      certbot --nginx $domains --agree-tos --email john@doe.com --non-interactive
     fi
     certbot renew --dry-run
   else 

@@ -18,7 +18,9 @@ RUN touch /var/log/node && mkdir /srv/node
 
 WORKDIR /srv/node
 
-COPY entrypoint.sh .
+COPY nginx ./nginx
+
+ADD entrypoint.sh get_domains.sh ./
 
 RUN ["chmod", "+x", "/srv/node/entrypoint.sh"]
 

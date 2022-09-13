@@ -1,0 +1,14 @@
+FROM omegareizo/nginx-node
+
+# The working directory is already set to /srv/node
+# Do not change, just copy your project files to the current directory
+
+COPY package.json ./
+
+RUN npm install
+
+COPY ./ ./
+
+RUN npm run build
+
+CMD ["npm", "run", "start"]
