@@ -20,6 +20,10 @@ WORKDIR /srv/node
 
 COPY nginx ./nginx
 
+# RUN mv nginx/default.example nginx/default
+
+RUN mv nginx/.conf.example nginx/.conf
+
 ADD entrypoint.sh build_default.sh get_domains.sh ./
 
 RUN ["chmod", "+x", "/srv/node/entrypoint.sh"]

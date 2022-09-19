@@ -1,0 +1,12 @@
+### Example file, create your own nginx/.conf in the root of your project. Do not put .example at the end
+
+# if you don't want to go through the task of creating an nginx server file
+# then you can provide the basic information in the nginx/.conf file.
+# For more advances features consider creating your own nginx default
+
+email=john@doe.com                                   # OPTIONAL: email used by letsencrypt for updates
+domains=brabbit.com,www.brabbit.com,mile.brabbit.com # add the domain or domains you want an ssl certificate for. Max 4
+port=4000                                            # port your default application is running on. localhost:4000
+public="public"                                      # OPTIONAL: name and path of your public folder. Default to the root of your project.
+locations="3000/api,3001/dashboard"                  # OPTIONAL: if you have multiple applications running on the server on different ports. PORT/LOCATION
+override=true                                        # OPTIONAL: overrides the default file if you have one

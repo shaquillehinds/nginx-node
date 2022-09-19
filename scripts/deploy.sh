@@ -1,3 +1,5 @@
+#!/bin/bash
+
 . version.txt
 
 inc="1"
@@ -14,4 +16,4 @@ docker tag nginx-node:$tag omegareizo/nginx-node:$tag
 docker push omegareizo/nginx-node:latest
 docker push omegareizo/nginx-node:$tag
 
-echo "version=$newVersion" >| ./version.txt
+echo "version=$newVersion" >|./version.txt

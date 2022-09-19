@@ -1,50 +1,79 @@
 #!/bin/bash
 
-$@ &> /var/log/node & disown
+separator="-------------------------------------------"
+
+if [ ! -s ./nginx/.conf ] && [ ! -s ./nginx/default ]; then
+  echo $separator
+  echo "no nginx/default file or nginx/.conf file. Running without certbot"
+  $@
+  exit
+fi
+
+if [ ! -s ./nginx/default ] && [ -s ./nginx/.conf ]; then
+  if bash ./build_default.sh &>log.txt; then
+    echo $separator
+    echo "Default built successfully"
+  else
+    echo $separator
+    echo "Default build failed, check your .conf file. Running without certbot"
+    $@
+    exit
+  fi
+fi
+
+$@ &>/var/log/node &
+disown
 
 cd /srv/node
 
-separator="-------------------------------------------"
+if [ -s ./nginx/.conf ]; then
+  . ./nginx/.conf
+  echo $separator
+  echo "Loading variables: email-$email port-$port"
+  if [ -z "$email" ]; then email=john@doe; fi
+  if [ -z "$port" ]; then
+    appPort=$(grep "^\s*proxy_pass\b" ./nginx/default | cut -d ";" -f 1 | rev | cut -d ":" -f 1 | rev)
+  else
+    appPort=$port
+  fi
+else
+  email=john@doe.com
+  appPort=$(grep "^\s*proxy_pass\b" ./nginx/default | cut -d ";" -f 1 | rev | cut -d ":" -f 1 | rev)
+fi
 
-if [[ -s ./nginx/default ]]
-then
+echo $separator
+echo "Using email: $email"
+
+if [ -n "$appPort" ]; then
+  retries=0
+  while [ $retries -lt 24 ]; do
+    echo $separator
+    echo "Waiting for application to be ready on port $appPort..."
+    if ss -tln | grep :$appPort &>/dev/null; then break; fi
+    sleep 5s
+    retries=$(($retries + 1))
+  done
+fi
+
+if [ -s ./nginx/default ]; then
   cp ./nginx/default /etc/nginx/sites-available/default
   echo $separator
   echo "Nginx default config found"
+  domainOpt=$(bash get_domains.sh)
   service nginx restart
-  domains=$(bash get_domains.sh)
+  echo $separator
+  echo $domainOpt
   publicPath=$(grep '^\s*root\b' ./nginx/default | cut -d ';' -f 1 | rev | cut -d ' ' -f 1 | rev)
-  if [ ! -z "$domains" ]
-  then
+  if [ -n "$domainOpt" ]; then
     echo $separator
-    echo "Found domain(s) in nginx default file: $domains"
-    if [ ! -z $publicPath ]
-    then
+    echo "Registering domain(s): $domainOpt"
+    if [ -n "$publicPath" ]; then
       echo $separator
       echo "Your current public path is: $publicPath"
     fi
-    if [[ -s ./nginx/.conf ]]
-    then
-      echo $separator
-      echo "Found .conf file"
-      . ./nginx/.conf
-      if [ ! -z $email ]
-      then
-        echo $separator
-        echo "Using email: $email"
-        certbot --nginx $domains --agree-tos --email $email --non-interactive
-      else
-         echo $separator
-         echo "No email found in .conf file. Using john@doe.com"
-         certbot --nginx $domains --agree-tos --email john@doe.com --non-interactive
-      fi
-    else
-      echo $separator
-      echo "No .conf file found in nginx folder. Running in non interactive mode with email: john@doe.com"
-      certbot --nginx $domains --agree-tos --email john@doe.com --non-interactive
-    fi
+    certbot --nginx $domainOpt --agree-tos --email $email --non-interactive
     certbot renew --dry-run
-  else 
+  else
     echo $separator
     echo "No domain found"
   fi

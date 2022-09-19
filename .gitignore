@@ -1,1 +1,5 @@
 test*.sh
+log.txt
+nginx/default
+nginx/.conf
+location
