@@ -44,6 +44,9 @@ fi
 echo $separator
 echo "Using email: $email"
 
+crontab certbot-cron
+service cron start
+
 if [ -n "$appPort" ]; then
   retries=0
   while [ $retries -lt 24 ]; do
