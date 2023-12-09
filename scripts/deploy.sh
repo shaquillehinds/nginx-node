@@ -5,7 +5,7 @@
 inc="1"
 
 newVersion=$(($version + $inc))
-tag="v-8.0.1"
+tag="v-8.0.2"
 
 docker build --platform linux/x86_64 -t nginx-node:latest .
 docker build --platform linux/x86_64 -t nginx-node:$tag .
